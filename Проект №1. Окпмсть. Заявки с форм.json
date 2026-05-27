@@ -1,0 +1,339 @@
+{
+  "name": "Проект №1. Окпмсть. Заявки с форм",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "leads",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -560,
+        16
+      ],
+      "id": "66a9c51c-3c23-45b3-9780-1ec8b52cf3c2",
+      "name": "Catch Lead",
+      "webhookId": "43cc8055-d88c-41eb-a4d0-7b7ab892136c"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1xih4cZfbxyyyJfIXsYlm51o_3XXhghlyIGpYkUhS09E",
+          "mode": "list",
+          "cachedResultName": "LeadFlow_Отчетность",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xih4cZfbxyyyJfIXsYlm51o_3XXhghlyIGpYkUhS09E/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xih4cZfbxyyyJfIXsYlm51o_3XXhghlyIGpYkUhS09E/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "comment",
+              "displayName": "comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -160,
+        16
+      ],
+      "id": "9e8b721f-16dd-4619-8f37-df7f564349c1",
+      "name": "Log to Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MKIlc2G5lH708h33",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "leads",
+        "operation": "createLeads",
+        "collection": {
+          "lead": [
+            {
+              "name": "=Новая заявка: {{ $('Format Data').item.json.name }}",
+              "pipeline_id": 10949550,
+              "status_id": 86095782,
+              "created_by": 13866046,
+              "updated_by": 13866046,
+              "responsible_user_id": 13866046,
+              "_embedded": {
+                "contacts": [
+                  {
+                    "id": {
+                      "contact": [
+                        {
+                          "id": "={{ $json._embedded.contacts[0].id }}"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        208,
+        16
+      ],
+      "id": "4ce4ee05-3929-43ff-a887-f3ccc83faec3",
+      "name": "Create Lead CRM",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "lKc1L0IOPNy9xxh8",
+          "name": "Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "7800896042",
+        "text": "=🔥 Получена новая заявка!\n\n👤 Имя: {{ $('Format Data').item.json.name }}\n📞 Телефон: {{ $('Format Data').item.json.phone }}\n✉️ Email: {{ $('Format Data').item.json.email }}\n📅 Дата: {{ $('Format Data').item.json.date }}\n\n💬 Комментарий: \n{{ $('Format Data').item.json.comment }}\n\n🚀 Сделка успешно создана в amoCRM!",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        16
+      ],
+      "id": "9abce0c8-65fc-4154-b167-3097f9f2829a",
+      "name": "TG Notification",
+      "webhookId": "d25c875a-2c08-4818-80ee-0db480b4ece2",
+      "credentials": {
+        "telegramApi": {
+          "id": "JKCtSfjOH8DAhJU0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "longLivedToken",
+        "resource": "contacts",
+        "operation": "createContacts",
+        "collection": {
+          "contact": [
+            {
+              "name": "={{ $('Format Data').item.json.name }}",
+              "responsible_user_id": 13866046,
+              "created_by": 13866046,
+              "updated_by": 13866046,
+              "custom_fields_values": {
+                "custom_field": [
+                  {
+                    "data": "{\"id\":1867285,\"type\":\"multitext\"}",
+                    "value": "={{ $('Format Data').item.json.phone }}"
+                  },
+                  {
+                    "data": "{\"id\":1867287,\"type\":\"multitext\"}",
+                    "value": "={{ $('Format Data').item.json.email }}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-amocrm.amocrm",
+      "typeVersion": 1,
+      "position": [
+        16,
+        16
+      ],
+      "id": "aa769db9-1d85-4190-a640-a82d0f909d26",
+      "name": "Create new contacts",
+      "credentials": {
+        "amocrmLongLivedApi": {
+          "id": "lKc1L0IOPNy9xxh8",
+          "name": "Amocrm Long Lived Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "de8bc00a-d54c-4ffb-aa73-0d7487cfa975",
+              "name": "name",
+              "value": "={{ $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "362f94cc-a1ce-403a-a19d-f7cd7d1e3d85",
+              "name": "phone",
+              "value": "={{ $json.body.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "e88f7659-b294-4156-9650-88b8fb915bf2",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "715a64f8-26c9-4b1a-9d3d-d384fc9ad7f4",
+              "name": "comment",
+              "value": "={{ $json.body.comment }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -352,
+        16
+      ],
+      "id": "575eadba-40c9-4b66-b39a-56049167b00b",
+      "name": "Format Data"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Catch Lead": {
+      "main": [
+        [
+          {
+            "node": "Format Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Sheets": {
+      "main": [
+        [
+          {
+            "node": "Create new contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Lead CRM": {
+      "main": [
+        [
+          {
+            "node": "TG Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create new contacts": {
+      "main": [
+        [
+          {
+            "node": "Create Lead CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Data": {
+      "main": [
+        [
+          {
+            "node": "Log to Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f481e46b-a408-4a03-9662-f6df2a7323d3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e1329b051fcbc4d125c46e302993d94b0f59f5adc0b0b1ceba5dcddbae9c4b3a"
+  },
+  "id": "n6Udk1TeYDF7SE29",
+  "tags": []
+}
